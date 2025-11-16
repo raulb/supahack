@@ -1,0 +1,70 @@
+{
+  "version": 1,
+  "tools": [
+    {
+      "name": "get_recent_entries",
+      "description": "Fetch the most recent submissions rows ordered by created_at descending.",
+      "type": "supabase-rpc",
+      "config": {
+        "schema": "public",
+        "function": "get_recent_entries"
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "limit_count": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Maximum number of rows to return.",
+            "default": 10
+          }
+        },
+        "required": [
+          "limit_count"
+        ]
+      }
+    },
+    {
+      "name": "search_vectors",
+      "description": "Return the closest submissions by comparing embeddings with the supplied query text.",
+      "type": "supabase-rpc",
+      "config": {
+        "schema": "public",
+        "function": "search_vectors"
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "Free-form query text that will be embedded for similarity search."
+          },
+          "match_count": {
+            "type": "integer",
+            "minimum": 1,
+            "default": 5,
+            "description": "Number of matches to return."
+          }
+        },
+        "required": [
+          "query",
+          "match_count"
+        ]
+      }
+    },
+    {
+      "name": "cluster_entries",
+      "description": "Compute two simple centroid clusters over submissions embeddings and return membership info.",
+      "type": "supabase-rpc",
+      "config": {
+        "schema": "public",
+        "function": "cluster_entries"
+      },
+      "input_schema": {
+        "type": "object",
+        "properties": {}
+      }
+    }
+  ]
+}
+
