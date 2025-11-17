@@ -110,6 +110,18 @@ Or trigger deployment through the Supabase MCP edge-function API if running insi
 
 3. Ensure the Supabase Edge Function is deployed and the MCP tools metadata is accessible to whichever agent will control Codex.
 
+## Deploying to Render
+
+Render can provision the entire stack from `render.yaml`. Either trigger a [Blueprint deploy](https://render.com/docs/infrastructure-as-code) that points at this repo or create a new Web Service with the following settings:
+
+- Environment: `Node`
+- Node version: `20` (picked up from `.nvmrc`/`package.json` engines or set `NODE_VERSION=20`)
+- Build command: `npm ci && npm run build`
+- Start command: `npm run start`
+- Health check path: `/`
+
+Set the required Supabase environment variables (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`) via Render’s dashboard or the Blueprint `envVars` entries. If you previously created the service with pnpm defaults, switch the build/start commands to the npm variants above—Render attempts `pnpm install --frozen-lockfile` when no npm lockfile is present, which fails for this project.
+
 ## Troubleshooting
 
 - **Realtime not updating**: confirm `submissions` is part of the `supabase_realtime` publication and the client URL/key match your project.
