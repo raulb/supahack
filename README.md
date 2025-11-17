@@ -1,4 +1,4 @@
-# Chato — Supabase Realtime Ideas Wall
+# SupaHack — Supabase Realtime Ideas Wall
 
 A Next.js 14 demo that streams audience “idea” submissions into Supabase, renders them as floating iOS-style bubbles, and exposes database helpers through Supabase MCP tools for AI agents (e.g. ChatGPT Desktop Codex).
 

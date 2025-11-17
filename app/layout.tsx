@@ -6,7 +6,7 @@ import './globals.css';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Chato Demo',
+  title: 'SupaHack Demo',
   description: 'Realtime submissions demo powered by Supabase.',
 };
 
