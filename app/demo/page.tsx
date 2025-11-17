@@ -20,7 +20,7 @@ type MessageBubble = {
   text: string;
   top: number;
   left: number;
-  colorClass: string;
+  colorClass: (typeof bubblePalettes)[number];
 };
 
 const bubblePalettes = [
@@ -106,7 +106,7 @@ export default function DemoPage() {
     setStatus('subscribing');
 
     const channel = supabase
-      .channel('demo-submissions')
+      .channel('public:submissions')
       .on(
         'postgres_changes',
         {
@@ -115,7 +115,7 @@ export default function DemoPage() {
           table: 'submissions',
         },
         (payload: SubmissionEvent) => {
-          const newRow = payload.new;
+          const newRow = payload.new as SubmissionRow | null;
           if (!newRow || typeof newRow.text !== 'string') return;
 
           setSubmissions((prev) => {
@@ -138,40 +138,43 @@ export default function DemoPage() {
 
     return () => {
       isMounted = false;
-      supabase.removeChannel(channel);
+      void channel.unsubscribe();
     };
   }, []);
 
   const messages = useMemo<MessageBubble[]>(() => {
     const takenSlots = new Set<number>();
+    const bubbles: MessageBubble[] = [];
 
-    return submissions
-      .slice(0, MAX_SLOTS)
-      .map((item, index) => {
-        const text = typeof item.text === 'string' ? item.text : '';
-        if (!text) return null;
+    const limit = Math.min(submissions.length, MAX_SLOTS);
 
-        const identifier = item.id ?? `${item.created_at ?? 'unknown'}-${index}`;
-        const { slotPreference, hash } = getBubblePosition(identifier);
-        const slotIndex = resolveSlot(slotPreference, takenSlots);
-        const baseSlot = slotTemplates[slotIndex];
+    for (let index = 0; index < limit; index += 1) {
+      const item = submissions[index];
+      const text = typeof item.text === 'string' ? item.text : '';
+      if (!text) continue;
 
-        const jitterTop = ((hash % 9) - 4) * 0.4;
-        const jitterLeft = (((Math.floor(hash / 19) % 9) - 4) * 0.4);
+      const identifier = item.id ?? `${item.created_at ?? 'unknown'}-${index}`;
+      const { slotPreference, hash } = getBubblePosition(identifier);
+      const slotIndex = resolveSlot(slotPreference, takenSlots);
+      const baseSlot = slotTemplates[slotIndex];
 
-        const top = clamp(baseSlot.top + jitterTop, 5, 92);
-        const left = clamp(baseSlot.left + jitterLeft, 10, 90);
-        const paletteIndex = Math.abs(hash) % bubblePalettes.length;
+      const jitterTop = ((hash % 9) - 4) * 0.4;
+      const jitterLeft = (((Math.floor(hash / 19) % 9) - 4) * 0.4);
 
-        return {
-          id: `${identifier}-${index}`,
-          text,
-          top,
-          left,
-          colorClass: bubblePalettes[paletteIndex],
-        };
-      })
-      .filter((bubble): bubble is MessageBubble => Boolean(bubble));
+      const top = clamp(baseSlot.top + jitterTop, 5, 92);
+      const left = clamp(baseSlot.left + jitterLeft, 10, 90);
+      const paletteIndex = Math.abs(hash) % bubblePalettes.length;
+
+      bubbles.push({
+        id: `${identifier}-${index}`,
+        text,
+        top,
+        left,
+        colorClass: bubblePalettes[paletteIndex],
+      });
+    }
+
+    return bubbles;
   }, [submissions]);
 
   const handleSubmit = async () => {
