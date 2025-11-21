@@ -130,3 +130,7 @@ Set the required Supabase environment variables (`NEXT_PUBLIC_SUPABASE_URL`, `NE
 
 Enjoy showcasing Supabase’s realtime + AI tooling!
 
+
+## Demo
+
+You can check out the prompt I used in the last Supabase Madrid meetup on November 20, 2025 [here](./absurd-startup-ideas/PROMPT.md), and the [results](./absurd-startup-ideas/2025-11-20.md) during the demo.
